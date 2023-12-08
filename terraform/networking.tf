@@ -78,7 +78,7 @@ resource "aws_subnet" "project_public_subnet" {
 }
 
 /*resource "aws_subnet" "project_private_subnet" {
-  #To have the noumber of public subnet en fonction du nombre de cidrs
+  ##To have the noumber of public subnet en fonction du nombre de cidrs
   count                   = length(var.private_cidrs)
   vpc_id                  = aws_vpc.project_vpc.id
   cidr_block              = var.private_cidrs[count.index]

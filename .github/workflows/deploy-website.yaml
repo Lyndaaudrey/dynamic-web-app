@@ -63,6 +63,11 @@ jobs:
         run: |-
           echo "::set-output name=instance_public_ip::$(terraform output instance_public_ip)"
 
+      - name: Terraform destroy
+        id: destroy
+        run: terraform destroy -auto-approve
+        if: steps.apply.outcome == 'success'
+
   website:
     name: Deploy application
     runs-on: ubuntu-latest

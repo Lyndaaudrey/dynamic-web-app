@@ -24,10 +24,12 @@ jobs:
   terraform:
     name: Deploy infrastructure
     runs-on: ubuntu-latest
+    outputs:
+      SERVER_PUBLIC_IP: ${{ steps.set-ip.outputs.instance_public_ip}}
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Terraform Setup
         uses: hashicorp/setup-terraform@v1
@@ -62,10 +64,59 @@ jobs:
       - name: Terraform apply
         id: apply
         run: terraform apply -auto-approve
-        if: steps.plan.outcome == 'success' && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: steps.plan.outcome == 'success'
         working-directory: ./terraform
 
-      - name: Terraform destroy
-        run: terraform destroy -auto-approve
-        if: steps.apply.outcome == 'success' && github.ref == 'refs/heads/main' && github.event_name == 'push'
-        working-directory: ./terraform
+      - name: Set output
+        id: set-ip
+        run: |-
+          echo "::set-output name=instance_public_ip::$(terraform output instance_public_ip)"
+
+  website:
+    name: Deploy application
+    runs-on: ubuntu-latest
+    #Can be deploy infrastructure
+    needs: terraform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set ip env variable
+        run: echo SERVER_PUBLIC_IP=${{ needs.terraform.outputs.SERVER_PUBLIC_IP }} >> $GITHUB_ENV
+
+      - name: Login to AWS ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-loging@v1
+
+      - name: Build and push docker image
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          REPOSITORY: dynamic-website-repo
+          IMAGE_TAG: ${{ github.sha }}
+
+        run: |-
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        working-directory: ./website
+
+      - name: Deploy docker image to EC2
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          REPOSITORY: dynamic-website-repo
+          IMAGE_TAG: ${{ github.sha }}
+          AWS_DEFAULT_REGION: us-east-1
+        uses: appleboy/ssh-action@master
+        with:
+          hosts: ${{ env.SERVER_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ env.AWS_SSH_KEY_PRIVATE }}
+          envs: AWS_SSH_KEY_PRIVATE,REGISTRY,REPOSITORY,IMAGE_TAG,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION, TF_VAR_REGION
+          script: |-
+            sudo apt update
+            sudo apt install docker.io -y
+            sudo apt install awscli -y
+            sudo $(aws ecr get-login --no-include-email --region us-east-1)
+            sudo docker stop myappcontainer || true
+            sudo docker rm myappcontainer || true
+            sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG
+            sudo docker run -d --name myappcontainer -p 80:8080 $REGISTRY/$REPOSITORY:$IMAGE_TAG

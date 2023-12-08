@@ -98,7 +98,7 @@ resource "aws_route_table_association" "project_route_assoc" {
   route_table_id = aws_route_table.project_rt.id
 }
 
-resource "aws_security_group" "projetc_sg" {
+/* resource "aws_security_group" "projetc_sg" {
   name        = "public_instances_sg"
   description = "Security group for public instances"
   vpc_id      = aws_vpc.project_vpc.id
@@ -122,4 +122,4 @@ resource "aws_security_group_rule" "engress_all" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.projetc_sg.id
 }
-
+ */

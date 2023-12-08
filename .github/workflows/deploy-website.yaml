@@ -49,16 +49,7 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        run: |-
-          terraform plan \
-          -var="region=$TF_VAR_REGION" \
-          -var="bucket_key=$TF_VAR_BUCKET_KEY" \
-          -var="bucket_name=$TF_VAR_BUCKET_NAME" \
-          -var="dynamodb_table=$TF_VAR_DYNAMODB_TABLE" \
-          -var="public_key=$AWS_SSH_KEY_PUBLIC" \
-          -var="private_key=$AWS_SSH_KEY_PRIVATE" \
-          -var="key_name=app_auth" \
-          -out=PLAN
+        run: terraform plan -out PLAN
         working-directory: ./terraform
 
       - name: Terraform apply

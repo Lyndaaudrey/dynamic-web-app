@@ -22,13 +22,23 @@ variable "public_key"{}
 
 variable "private_key" {}
 
-variable "key_name" {}
+variable "key_name" {
+  type = string 
+}
 
 
-variable "bucket_name" {}
+variable "bucket_name" {
+  type = string
+}
 
-variable "dynamodb_table" {}
+variable "dynamodb_table" {
+  type = string
+}
 
-variable "region" {}
+variable "region" {
+  type = string
+}
 
-variable "bucket_key" {}
+variable "bucket_key" {
+  type = string
+}

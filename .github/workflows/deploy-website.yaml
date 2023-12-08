@@ -84,10 +84,13 @@ jobs:
       - name: Login to AWS ECR
         id: ecr-login
         uses: aws-actions/amazon-ecr-loging@v2
+        with:
+          registry-type: public
 
       - name: Build and push docker image
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          REGISTRY_ALIAS: my-ecr-public-registry-alias
           REPOSITORY: website-repo
           IMAGE_TAG: ${{ github.sha }}
 

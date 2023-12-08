@@ -79,10 +79,17 @@ jobs:
         id: ecr-login
         uses: aws-actions/amazon-ecr-loging@v1
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
       - name: Build and push docker image
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          REPOSITORY: dynamic-website-repo
+          REPOSITORY: website-repo
           IMAGE_TAG: ${{ github.sha }}
 
         run: |-

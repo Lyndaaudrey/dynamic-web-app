@@ -9,7 +9,7 @@ locals {
 
 
 # Creation du vpc
-#
+
 
 resource "aws_vpc" "project_vpc" {
   cidr_block           = var.vpc_cidr
@@ -65,20 +65,19 @@ resource "aws_default_route_table" "project_private_rt" {
 }
 
 resource "aws_subnet" "project_public_subnet" {
-  #To have the noumber of public subnet en fonction du nombre de cidrs
-  count                   = length(var.public_cidrs)
+ 
   vpc_id                  = aws_vpc.project_vpc.id
-  cidr_block              = var.public_cidrs[count.index]
+  cidr_block              = var.public_cidrs[0]
   map_public_ip_on_launch = true
   #Chaque subnet est dans un AZ, si on veut une seule AZ on fait names[0]
-  availability_zone = local.azs[count.index]
+  availability_zone = local.azs[0]
 
   tags = {
     Name = "project_public_subnet_${count.index + 1}"
   }
 }
 
-resource "aws_subnet" "project_private_subnet" {
+/*resource "aws_subnet" "project_private_subnet" {
   #To have the noumber of public subnet en fonction du nombre de cidrs
   count                   = length(var.private_cidrs)
   vpc_id                  = aws_vpc.project_vpc.id
@@ -90,7 +89,7 @@ resource "aws_subnet" "project_private_subnet" {
   tags = {
     Name = "project_private_subnet_${count.index + 1}"
   }
-}
+}*/
 
 resource "aws_route_table_association" "project_route_assoc" {
   count          = length(var.public_cidrs)

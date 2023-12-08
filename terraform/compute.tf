@@ -29,6 +29,7 @@ resource "aws_iam_instance_profile" "app_profile" {
 # Create an instance
 
 resource "aws_instance" "app_instance" {
+  #subnet_id = aws_subnet.project_public_subnet[0]
   ami= data.aws_ami.server_ami.id
   instance_type = "t2.micro"
   key_name = aws_key_pair.instance_key.key_name

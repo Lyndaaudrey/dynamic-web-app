@@ -18,9 +18,6 @@ variable "access_ip" {
   default = "0.0.0.0/0"
 }
 
-variable "public_key"{}
-
-variable "private_key" {}
 
 variable "key_name" {
   type = string 

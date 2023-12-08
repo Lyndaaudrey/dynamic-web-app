@@ -90,7 +90,7 @@ jobs:
       - name: Build and push docker image
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          REGISTRY_ALIAS: my-ecr-public-registry-alias
+          REGISTRY_ALIAS: m4p5a8i8
           REPOSITORY: website-repo
           IMAGE_TAG: ${{ github.sha }}
 

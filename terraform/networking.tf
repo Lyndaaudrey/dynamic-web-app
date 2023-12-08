@@ -1,17 +1,17 @@
 
 # Acceder à la diste des az disponible
 ##
-data "aws_availability_zones" "available" {}
+/* data "aws_availability_zones" "available" {}
 
 locals {
   azs = data.aws_availability_zones.available.names
 }
-
+ */
 
 # Creation du vpc
 
 
-resource "aws_vpc" "project_vpc" {
+/* resource "aws_vpc" "project_vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
@@ -24,20 +24,20 @@ resource "aws_vpc" "project_vpc" {
     create_before_destroy = true
   }
 
-}
+} */
 
 # Creation du internet gateway 
 
-resource "aws_internet_gateway" "project_internet_gateway" {
+/* resource "aws_internet_gateway" "project_internet_gateway" {
   vpc_id = aws_vpc.project_vpc.id
 
   tags = {
     Name = "Project_vpc_igw"
   }
-}
+} */
 
 # Creation de la table de routage
-
+/* 
 resource "aws_route_table" "project_rt" {
   vpc_id = aws_vpc.project_vpc.id
 
@@ -45,26 +45,26 @@ resource "aws_route_table" "project_rt" {
     Name = "project_public_rt"
   }
 }
-
+ */
 # Creation de la default route
-
+/* 
 resource "aws_route" "default_route" {
   route_table_id         = aws_route_table.project_rt.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.project_internet_gateway.id
-}
+} */
 
 # Creation de la default route table
 
-resource "aws_default_route_table" "project_private_rt" {
+/* resource "aws_default_route_table" "project_private_rt" {
   default_route_table_id = aws_vpc.project_vpc.default_route_table_id
 
   tags = {
     Name = "project_private_rt"
   }
-}
+} */
 
-resource "aws_subnet" "project_public_subnet" {
+/* resource "aws_subnet" "project_public_subnet" {
  
   vpc_id                  = aws_vpc.project_vpc.id
   cidr_block              = var.public_cidrs[0]
@@ -75,7 +75,7 @@ resource "aws_subnet" "project_public_subnet" {
   tags = {
     Name = "project_public_subnet"
   }
-}
+} */
 
 /*resource "aws_subnet" "project_private_subnet" {
   ##To have the noumber of public subnet en fonction du nombre de cidrs
@@ -91,11 +91,11 @@ resource "aws_subnet" "project_public_subnet" {
   }
 }*/
 
-resource "aws_route_table_association" "project_route_assoc" {
+/* resource "aws_route_table_association" "project_route_assoc" {
   subnet_id      = aws_subnet.project_public_subnet.id
   route_table_id = aws_route_table.project_rt.id
 }
-
+ */
 /* resource "aws_security_group" "projetc_sg" {
   name        = "public_instances_sg"
   description = "Security group for public instances"

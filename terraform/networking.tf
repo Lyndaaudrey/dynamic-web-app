@@ -73,7 +73,7 @@ resource "aws_subnet" "project_public_subnet" {
   availability_zone = local.azs[0]
 
   tags = {
-    Name = "project_public_subnet_${count.index + 1}"
+    Name = "project_public_subnet"
   }
 }
 
@@ -92,8 +92,7 @@ resource "aws_subnet" "project_public_subnet" {
 }*/
 
 resource "aws_route_table_association" "project_route_assoc" {
-  count          = length(var.public_cidrs)
-  subnet_id      = aws_subnet.project_public_subnet[count.index].id
+  subnet_id      = aws_subnet.project_public_subnet.id
   route_table_id = aws_route_table.project_rt.id
 }
 

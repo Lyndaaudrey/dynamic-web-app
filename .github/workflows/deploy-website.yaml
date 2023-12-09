@@ -99,9 +99,9 @@ jobs:
           tags: lyndaaaudrey/website-repo:${{ github.sha }}
 
       - name: Deploy docker image to EC2
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          hosts: 52.72.5.3
+          hosts: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ env.SSH_PRVIVATE }}
           script: |

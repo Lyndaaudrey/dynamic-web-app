@@ -1,6 +1,14 @@
 name: Deploy website
 
 on:
+  workflow_dispatch:
+    inputs:
+      terraform_operation:
+        description: "Terraform operation destroy"
+        type: choice
+        options:
+          - destroy
+
   push:
     branches:
       - main
@@ -69,6 +77,11 @@ jobs:
         id: set-ssh-private
         run: |
           echo "::set-output name=ssh_private::$(terraform output ssh_private)"
+      
+      - name: Terraform destroy 
+        id: destroy
+        run: terraform destroy -auto-approve
+        if: steps.apply.outcome == 'success' && github.event.inputs.terraform_operation == 'destroy'
 
   website:
     name: Deploy application

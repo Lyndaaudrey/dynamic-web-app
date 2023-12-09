@@ -32,7 +32,7 @@ jobs:
 
       - name: Terraform init
         id: init
-        run: terraform init -backend-config="bucket=$TF_VAR_BUCKET_NAME" -backend-config="dynamodb_table=$TF_VAR_DYNAMODB_TABLE" -backend-config="region=$TF_VAR_REGION"
+        run: terraform init
         working-directory: ./terraform
 
       - name: Terraform validate

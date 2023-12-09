@@ -1,12 +1,20 @@
-# nginx state for serving content
-FROM nginx:alpine
-# Set working directory to nginx asset directory
-WORKDIR /usr/share/nginx/html
-# Remove default nginx static assets
-RUN rm -rf ./*
-# Copy static assets over
-COPY ./website/ ./
+FROM node:16-alpine3.11
+
+# create app directory in container
+RUN mkdir -p /home/app
+
+# copy local app to container app directory
+COPY ./website /home/app
+
+# set default app direcotry in container
+WORKDIR /home/app
+
+# install app dependencies
+RUN npm install
+
 #Expose
 EXPOSE 80
-# Containers run nginx with global directives and daemon off
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
+# run the server
+CMD ["node", "server.js"]
+

@@ -3,12 +3,13 @@ name: Deploy website
 on:
   workflow_dispatch:
     inputs:
-      terraform_operation:
+      name:
         description: "Terraform operation destroy"
         required: true
+        default: destroy
         type: choice
         options:
-          - destroy
+        - destroy
 
   push:
     branches:

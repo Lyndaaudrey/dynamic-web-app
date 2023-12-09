@@ -83,7 +83,7 @@ jobs:
       - name: Terraform destroy
         id: destroy
         run: terraform destroy -auto-approve
-        if: steps.apply.outcome == 'success' && github.event.inputs.terraform_operation == 'destroy'
+        if: steps.apply.outcome == 'success' 
 
   website:
     name: Deploy application

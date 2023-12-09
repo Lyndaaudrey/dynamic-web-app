@@ -101,7 +101,7 @@ jobs:
       - name: Deploy docker image to EC2
         uses: appleboy/ssh-action@master
         with:
-          hosts: ${{ secrets.EC2_HOST }}
+          hosts: 52.72.5.3
           username: ubuntu
           key: ${{ env.SSH_PRVIVATE }}
           script: |

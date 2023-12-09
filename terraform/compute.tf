@@ -47,6 +47,14 @@ resource "aws_instance" "app_instance" {
   }
 }
 
+
+resource "aws_eip_association" "eip_assoc" {
+  instance_id   = aws_instance.app_instance.id
+  allocation_id = "eipalloc-0bf37d8bc49556885"
+}
+
+
+
 /* resource "aws_security_group" "app_sg" {
   name        = "public_instances_sg"
   description = "Security group for public instances"

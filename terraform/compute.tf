@@ -44,7 +44,7 @@ resource "aws_instance" "app_instance" {
   } */
 
   tags = {
-    name = "app_server"
+    Name = "app_server"
   }
 }
 

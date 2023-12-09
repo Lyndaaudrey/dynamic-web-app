@@ -5,6 +5,7 @@ on:
     inputs:
       terraform_operation:
         description: "Terraform operation destroy"
+        required: true
         type: choice
         options:
           - destroy
@@ -77,8 +78,8 @@ jobs:
         id: set-ssh-private
         run: |
           echo "::set-output name=ssh_private::$(terraform output ssh_private)"
-      
-      - name: Terraform destroy 
+
+      - name: Terraform destroy
         id: destroy
         run: terraform destroy -auto-approve
         if: steps.apply.outcome == 'success' && github.event.inputs.terraform_operation == 'destroy'

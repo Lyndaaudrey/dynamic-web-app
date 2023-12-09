@@ -96,18 +96,4 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: lyndaaaudrey/website-repo:${{ github.sha }}
-
-      - name: Deploy docker image to EC2
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          hosts: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ env.SSH_PRVIVATE }}
-          script: |
-            sudo apt update
-            sudo apt install docker.io -y
-            sudo docker stop website || true
-            sudo docker rm website || true
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/website-repo:${{ github.sha }}
-            sudo docker run -d --name website -p 80:8080 ${{ secrets.DOCKER_USERNAME }}/website-repo:${{ github.sha }}
+          tags: lyndaaaudrey/website-repo:latest

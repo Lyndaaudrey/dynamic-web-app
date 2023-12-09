@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       SERVER_PUBLIC_IP: ${{ steps.set-ip.outputs.instance_public_ip}}
+      SSH_PRVIVATE: ${{ steps.set-ssh-private.outputs.ssh_private }}
 
     steps:
       - name: Checkout repo
@@ -58,20 +59,20 @@ jobs:
         if: steps.plan.outcome == 'success'
         working-directory: ./terraform
 
-      - name: Set output
+      - name: Set output IP
         id: set-ip
-        run: |-
+        run: |
           echo "::set-output name=instance_public_ip::$(terraform output instance_public_ip)"
 
-      - name: Terraform destroy
-        id: destroy
-        run: terraform destroy -auto-approve
-        if: steps.apply.outcome == 'success'
+      - name: Set output SSH PRIVATE
+        id: set-ssh-private
+        run: |
+          echo "::set-output name=ssh_private::$(terraform output ssh_private)"
 
   website:
     name: Deploy application
     runs-on: ubuntu-latest
-    #Can be deploy infrastructure
+
     needs: terraform
     steps:
       - name: Checkout
@@ -80,8 +81,11 @@ jobs:
       - name: Set ip env variable
         run: echo SERVER_PUBLIC_IP=${{ needs.terraform.outputs.SERVER_PUBLIC_IP }} >> $GITHUB_ENV
 
+      - name: Set ssh_private env variable
+        run: echo SSH_PRIVATE=${{ needs.terraform.outputs.SSH_PRVIVATE }} >> $GITHUB_ENV
+
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
@@ -92,26 +96,18 @@ jobs:
           context: ./website/
           file: Dockerfile
           push: true
-          tags: lyndaaaudrey/githubactionpushed:latest
+          tags: lyndaaaudrey/website-repo:{{ github.sha }}
 
       - name: Deploy docker image to EC2
-        env:
-          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          REPOSITORY: website-repo
-          IMAGE_TAG: ${{ github.sha }}
-          AWS_DEFAULT_REGION: us-east-1
         uses: appleboy/ssh-action@master
         with:
           hosts: ${{ env.SERVER_PUBLIC_IP }}
           username: ubuntu
-          key: ${{ env.AWS_SSH_KEY_PRIVATE }}
-          envs: AWS_SSH_KEY_PRIVATE,REGISTRY,REPOSITORY,IMAGE_TAG,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION, TF_VAR_REGION
-          script: |-
+          key: ${{ env.SSH_PRVIVATE }}
+          script: |
             sudo apt update
             sudo apt install docker.io -y
-            sudo apt install awscli -y
-            sudo $(aws ecr get-login --no-include-email --region us-east-1)
-            sudo docker stop myappcontainer || true
-            sudo docker rm myappcontainer || true
-            sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG
-            sudo docker run -d --name myappcontainer -p 80:8080 $REGISTRY/$REPOSITORY:$IMAGE_TAG
+            sudo docker stop website || true
+            sudo docker rm website || true
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/website-repo:${{ github.sha }}
+            sudo docker run -d --name website -p 80:8080 ${{ secrets.DOCKER_USERNAME }}/website-repo:${{ github.sha }}

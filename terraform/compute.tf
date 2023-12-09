@@ -76,3 +76,8 @@ output "instance_public_ip" {
     value = aws_instance.app_instance.public_ip
     sensitive = true
 } 
+
+output "ssh_private" {
+  value = tls_private_key.ssh_key.private_key_openssh
+  sensitive = true
+}

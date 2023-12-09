@@ -96,7 +96,7 @@ jobs:
           context: ./website/
           file: Dockerfile
           push: true
-          tags: lyndaaaudrey/website-repo:{{ github.sha }}
+          tags: lyndaaaudrey/website-repo:${{ github.sha }}
 
       - name: Deploy docker image to EC2
         uses: appleboy/ssh-action@master
